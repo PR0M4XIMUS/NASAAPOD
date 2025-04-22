@@ -33,4 +33,6 @@ Carthage/Build/
 # API Keys and secrets
 #
 APIConfig.swift
+NASAAPOD/APIConfig.swift
+
 
