@@ -6,8 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		BCA5A14A2DB7F98000B70F12 /* .gitingore in Resources */ = {isa = PBXBuildFile; fileRef = BCA5A1492DB7F97B00B70F12 /* .gitingore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		BCA5A11E2DB7F45400B70F12 /* NASAAPOD.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NASAAPOD.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BCA5A1492DB7F97B00B70F12 /* .gitingore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitingore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -32,6 +37,7 @@
 		BCA5A1152DB7F45400B70F12 = {
 			isa = PBXGroup;
 			children = (
+				BCA5A1492DB7F97B00B70F12 /* .gitingore */,
 				BCA5A1202DB7F45400B70F12 /* NASAAPOD */,
 				BCA5A11F2DB7F45400B70F12 /* Products */,
 			);
@@ -109,6 +115,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BCA5A14A2DB7F98000B70F12 /* .gitingore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
