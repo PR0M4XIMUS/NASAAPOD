@@ -1,5 +1,6 @@
 import Foundation
 
+// Data model for Astronomy Picture of the Day response
 struct APODResponse: Codable {
     let date: String
     let explanation: String
@@ -9,6 +10,7 @@ struct APODResponse: Codable {
     let title: String
     let url: String
     
+    // Map JSON keys to Swift properties
     enum CodingKeys: String, CodingKey {
         case date
         case explanation
