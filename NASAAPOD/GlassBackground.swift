@@ -9,11 +9,11 @@ struct GlassBackground: ViewModifier {
     
     // Provide fallback values when motion manager is not available
     private var roll: Double {
-        return (try? motionManager.roll) ?? 0.0
+        return motionManager.roll ?? 0.0
     }
     
     private var pitch: Double {
-        return (try? motionManager.pitch) ?? 0.0
+        return motionManager.pitch ?? 0.0
     }
     
     func body(content: Content) -> some View {
