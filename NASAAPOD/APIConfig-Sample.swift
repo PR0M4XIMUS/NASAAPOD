@@ -1,7 +1,7 @@
 import Foundation
 
 // IMPORTANT: Copy this file to "APIConfig.swift" and replace the placeholder with your actual NASA API key
-struct APiConfig {
+struct APIConfig {
     // Replace with your NASA API key before running the app
     static let nasaAPIKey = "YOUR_NASA_API_KEY"
 }
