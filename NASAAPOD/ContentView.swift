@@ -6,6 +6,7 @@ struct ContentView: View {
     // State objects and properties
     @StateObject private var viewModel = APODViewModel()
     @State private var isDatePickerShown = false
+    @State private var isSettingsShown = false
     
     var body: some View {
         NavigationView {
@@ -353,9 +354,22 @@ struct ContentView: View {
                         }
                     }
 
-                    // Favorite and Share buttons
+                    // Settings, Favorite, and Today buttons
                     ToolbarItem(placement: .navigationBarTrailing) {
                         HStack(spacing: AppTheme.smallPadding) {
+                            // Settings button
+                            Button(action: {
+                                isSettingsShown = true
+                            }) {
+                                Image(systemName: "gear")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.white)
+                                    .padding(.vertical, 8)
+                                    .padding(.horizontal, AppTheme.mediumPadding)
+                                    .glassBackground(cornerRadius: AppTheme.smallCornerRadius, intensity: 0.85)
+                            }
+
                             // Favorite button
                             Button(action: {
                                 viewModel.toggleFavorite()
@@ -390,6 +404,9 @@ struct ContentView: View {
                     }
                 }
             }
+        }
+        .sheet(isPresented: $isSettingsShown) {
+            SettingsView()
         }
     }
 }
