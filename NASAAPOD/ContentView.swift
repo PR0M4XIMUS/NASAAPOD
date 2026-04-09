@@ -20,64 +20,83 @@ struct ContentView: View {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: .white))
                             .scaleEffect(1.5)
-                    } else if let errorMessage = viewModel.errorMessage {
+                    } else if viewModel.error != nil {
                         // Error state
                         VStack(spacing: 16) {
                             Image(systemName: "exclamationmark.circle.fill")
                                 .font(.system(size: 48))
-                                .foregroundColor(.orange)
+                                .foregroundColor(AppTheme.errorColor)
 
                             Text("Unable to Load")
                                 .font(.headline)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.white)
 
-                            Text(errorMessage)
+                            Text(viewModel.errorMessage ?? "An error occurred")
                                 .font(.subheadline)
-                                .foregroundColor(.white.opacity(0.8))
+                                .foregroundColor(.white.opacity(AppTheme.secondaryTextOpacity))
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal)
 
-                            Button(action: {
-                                viewModel.loadAPOD()
-                            }) {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "arrow.clockwise")
-                                        .fontWeight(.semibold)
-                                    Text("Try Again")
-                                        .fontWeight(.semibold)
+                            VStack(spacing: AppTheme.smallPadding) {
+                                Button(action: {
+                                    viewModel.retryLoading()
+                                }) {
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "arrow.clockwise")
+                                            .fontWeight(.semibold)
+                                        Text("Retry")
+                                            .fontWeight(.semibold)
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, AppTheme.standardPadding)
+                                    .foregroundColor(.white)
+                                    .glassBackground(cornerRadius: AppTheme.smallCornerRadius, intensity: 0.9)
                                 }
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 12)
-                                .foregroundColor(.white)
-                                .glassBackground(cornerRadius: 10, intensity: 0.9)
+
+                                if viewModel.cachedAPOD != nil {
+                                    Text("Showing cached data")
+                                        .font(.caption)
+                                        .foregroundColor(.white.opacity(0.6))
+                                }
                             }
                         }
                         .frame(width: geometry.size.width * 0.85)
-                        .padding(20)
-                        .glassBackground(cornerRadius: 20, intensity: 0.95)
+                        .padding(AppTheme.standardPadding)
+                        .glassBackground(cornerRadius: AppTheme.largeCornerRadius, intensity: 0.95)
                     } else if let apod = viewModel.apod {
                         // Content state - showing APOD data
                         ScrollView {
-                            VStack(alignment: .leading, spacing: 16) {
+                            VStack(alignment: .leading, spacing: AppTheme.standardPadding) {
                                 // Title with glass background
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text(apod.title)
-                                        .font(.title2)
-                                        .fontWeight(.bold)
-                                        .tracking(0.3)
-                                        .foregroundColor(.white)
-                                        .lineLimit(3)
+                                VStack(alignment: .leading, spacing: AppTheme.smallPadding) {
+                                    HStack(alignment: .top) {
+                                        Text(apod.title)
+                                            .font(.title2)
+                                            .fontWeight(.bold)
+                                            .tracking(0.3)
+                                            .foregroundColor(.white)
+                                            .lineLimit(4)
+
+                                        // Share button in title
+                                        if let imageURL = apod.validatedImageURL {
+                                            ShareLink(item: imageURL, subject: Text(apod.title), message: Text(apod.explanation)) {
+                                                Image(systemName: "square.and.arrow.up")
+                                                    .font(.subheadline)
+                                                    .foregroundColor(AppTheme.accentColor)
+                                            }
+                                        }
+                                    }
                                 }
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(16)
-                                .glassBackground(cornerRadius: 14, intensity: 0.85)
-                                .padding(.horizontal, 12)
-                                .padding(.top, 8)
+                                .padding(AppTheme.standardPadding)
+                                .glassBackground(cornerRadius: AppTheme.standardCornerRadius, intensity: 0.85)
+                                .padding(.horizontal, AppTheme.mediumPadding)
+                                .padding(.top, AppTheme.smallPadding)
                                 
                                 // Media content - image or video
-                                if apod.mediaType == "image" {
-                                    AsyncImage(url: URL(string: apod.url)) { phase in
+                                if apod.mediaType.isImage {
+                                    AsyncImage(url: apod.validatedImageURL) { phase in
                                         switch phase {
                                         case .empty:
                                             ProgressView()
@@ -88,57 +107,67 @@ struct ContentView: View {
                                                 .resizable()
                                                 .aspectRatio(contentMode: .fit)
                                                 .frame(maxHeight: geometry.size.height * 0.5)
-                                                .cornerRadius(12)
+                                                .cornerRadius(AppTheme.standardCornerRadius)
                                         case .failure:
-                                            Image(systemName: "photo")
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fit)
-                                                .foregroundColor(.gray)
-                                                .frame(height: geometry.size.height * 0.3)
+                                            VStack(spacing: 8) {
+                                                Image(systemName: "photo.circle")
+                                                    .font(.system(size: 32))
+                                                Text("Image unavailable")
+                                                    .font(.caption)
+                                            }
+                                            .foregroundColor(.gray)
+                                            .frame(height: geometry.size.height * 0.3)
                                         @unknown default:
                                             EmptyView()
                                         }
                                     }
                                     .frame(maxWidth: geometry.size.width)
-                                    .padding(.horizontal, 12)
-                                } else if apod.mediaType == "video" {
-                                    // Video link button
-                                    Link(destination: URL(string: apod.url)!) {
-                                        HStack(spacing: 8) {
-                                            Image(systemName: "play.circle.fill")
-                                                .font(.title3)
-                                                .foregroundColor(.blue)
-                                            Text("Watch Video")
-                                                .font(.subheadline)
-                                                .fontWeight(.semibold)
-                                                .foregroundColor(.white)
+                                    .padding(.horizontal, AppTheme.mediumPadding)
+                                } else if apod.mediaType.isVideo {
+                                    // Video link button - safe URL handling
+                                    if let videoURL = apod.validatedURL {
+                                        Link(destination: videoURL) {
+                                            HStack(spacing: 8) {
+                                                Image(systemName: "play.circle.fill")
+                                                    .font(.title3)
+                                                    .foregroundColor(AppTheme.accentColor)
+                                                Text("Watch Video")
+                                                    .font(.subheadline)
+                                                    .fontWeight(.semibold)
+                                                    .foregroundColor(.white)
+                                            }
+                                            .frame(maxWidth: .infinity)
+                                            .padding(.vertical, AppTheme.standardPadding)
+                                            .padding(.horizontal, AppTheme.standardPadding)
+                                            .glassBackground(cornerRadius: AppTheme.smallCornerRadius, intensity: 0.95)
                                         }
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 12)
-                                        .padding(.horizontal, 16)
-                                        .glassBackground(cornerRadius: 12, intensity: 0.95)
+                                        .padding(.horizontal, AppTheme.mediumPadding)
+                                    } else {
+                                        Text("Video URL unavailable")
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                            .padding()
                                     }
-                                    .padding(.horizontal, 12)
                                 }
                                 
                                 // Date and explanation text
-                                VStack(alignment: .leading, spacing: 12) {
+                                VStack(alignment: .leading, spacing: AppTheme.mediumPadding) {
                                     Text(apod.date)
                                         .font(.caption)
                                         .fontWeight(.semibold)
                                         .tracking(0.5)
-                                        .foregroundColor(.white.opacity(0.8))
+                                        .foregroundColor(.white.opacity(AppTheme.secondaryTextOpacity))
 
                                     Text(apod.explanation)
                                         .font(.footnote)
-                                        .foregroundColor(.white.opacity(0.85))
+                                        .foregroundColor(.white.opacity(AppTheme.primaryTextOpacity))
                                         .lineSpacing(4)
                                 }
-                                .padding(16)
+                                .padding(AppTheme.standardPadding)
                                 .glassBackground(intensity: 0.9)
-                                .padding(.horizontal, 12)
-                                
-                                Spacer(minLength: 16)
+                                .padding(.horizontal, AppTheme.mediumPadding)
+
+                                Spacer(minLength: AppTheme.standardPadding)
                             }
                             .padding(.vertical, 12)
                         }
@@ -157,7 +186,7 @@ struct ContentView: View {
                         // Date picker container with enhanced glass effect
                         VStack(spacing: 0) {
                             // Header with accent
-                            VStack(spacing: 8) {
+                            VStack(spacing: AppTheme.smallPadding) {
                                 Text("Select Date")
                                     .font(.headline)
                                     .fontWeight(.semibold)
@@ -165,15 +194,15 @@ struct ContentView: View {
 
                                 Text("Browse APOD history since June 1995")
                                     .font(.caption)
-                                    .foregroundColor(.white.opacity(0.7))
+                                    .foregroundColor(.white.opacity(AppTheme.tertiaryTextOpacity))
                             }
-                            .padding(.top, 16)
-                            .padding(.bottom, 12)
+                            .padding(.top, AppTheme.standardPadding)
+                            .padding(.bottom, AppTheme.mediumPadding)
 
                             // Date Picker with enhanced visibility
                             ZStack {
                                 // Glass background for picker
-                                RoundedRectangle(cornerRadius: 12)
+                                RoundedRectangle(cornerRadius: AppTheme.smallCornerRadius)
                                     .fill(
                                         LinearGradient(
                                             gradient: Gradient(colors: [
@@ -185,7 +214,7 @@ struct ContentView: View {
                                         )
                                     )
                                     .background(
-                                        RoundedRectangle(cornerRadius: 12)
+                                        RoundedRectangle(cornerRadius: AppTheme.smallCornerRadius)
                                             .fill(Color.black.opacity(0.3))
                                     )
 
@@ -195,20 +224,20 @@ struct ContentView: View {
                                           in: viewModel.minDate...viewModel.maxDate,
                                           displayedComponents: .date)
                                     .datePickerStyle(GraphicalDatePickerStyle())
-                                    .padding(8)
+                                    .padding(AppTheme.smallPadding)
                                     .colorScheme(.dark)
-                                    .accentColor(.blue)
+                                    .accentColor(AppTheme.accentColor)
                                     .scaleEffect(0.83)
                                     .frame(height: geometry.size.height * 0.4)
                             }
                             .overlay(
-                                RoundedRectangle(cornerRadius: 12)
+                                RoundedRectangle(cornerRadius: AppTheme.smallCornerRadius)
                                     .stroke(Color.white.opacity(0.15), lineWidth: 0.5)
                             )
-                            .padding(.horizontal, 12)
+                            .padding(.horizontal, AppTheme.mediumPadding)
 
                             // Control buttons with glass effect
-                            HStack(spacing: 12) {
+                            HStack(spacing: AppTheme.mediumPadding) {
                                 Button(action: {
                                     isDatePickerShown = false
                                 }) {
@@ -219,9 +248,9 @@ struct ContentView: View {
                                             .fontWeight(.semibold)
                                     }
                                     .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 12)
+                                    .padding(.vertical, AppTheme.standardPadding)
                                     .foregroundColor(.white)
-                                    .glassBackground(cornerRadius: 10, intensity: 0.75)
+                                    .glassBackground(cornerRadius: AppTheme.smallCornerRadius, intensity: 0.75)
                                 }
 
                                 Button(action: {
@@ -235,24 +264,24 @@ struct ContentView: View {
                                             .fontWeight(.semibold)
                                     }
                                     .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 12)
+                                    .padding(.vertical, AppTheme.standardPadding)
                                     .foregroundColor(.white)
-                                    .background(Color.blue.opacity(0.8))
-                                    .cornerRadius(10)
+                                    .background(AppTheme.accentColor.opacity(0.8))
+                                    .cornerRadius(AppTheme.smallCornerRadius)
                                     .overlay(
-                                        RoundedRectangle(cornerRadius: 10)
-                                            .stroke(Color.blue.opacity(0.5), lineWidth: 1)
+                                        RoundedRectangle(cornerRadius: AppTheme.smallCornerRadius)
+                                            .stroke(AppTheme.accentColor.opacity(0.5), lineWidth: 1)
                                     )
                                 }
                             }
-                            .padding(.horizontal, 12)
-                            .padding(.top, 12)
-                            .padding(.bottom, 16)
+                            .padding(.horizontal, AppTheme.mediumPadding)
+                            .padding(.top, AppTheme.mediumPadding)
+                            .padding(.bottom, AppTheme.standardPadding)
                         }
                         .background(
                             ZStack {
                                 // Glass morphism background layers
-                                RoundedRectangle(cornerRadius: 20)
+                                RoundedRectangle(cornerRadius: AppTheme.largeCornerRadius)
                                     .fill(
                                         LinearGradient(
                                             gradient: Gradient(colors: [
@@ -264,11 +293,11 @@ struct ContentView: View {
                                         )
                                     )
 
-                                RoundedRectangle(cornerRadius: 20)
+                                RoundedRectangle(cornerRadius: AppTheme.largeCornerRadius)
                                     .fill(Color.black.opacity(0.4))
 
                                 // Blur effect
-                                RoundedRectangle(cornerRadius: 20)
+                                RoundedRectangle(cornerRadius: AppTheme.largeCornerRadius)
                                     .fill(Color.white.opacity(0.01))
                                     .blur(radius: 20)
                             }
@@ -276,7 +305,7 @@ struct ContentView: View {
                         )
                         .overlay(
                             // Sophisticated border
-                            RoundedRectangle(cornerRadius: 20)
+                            RoundedRectangle(cornerRadius: AppTheme.largeCornerRadius)
                                 .stroke(
                                     LinearGradient(
                                         gradient: Gradient(colors: [
@@ -298,41 +327,65 @@ struct ContentView: View {
                 .toolbar {
                     // Date selector button
                     ToolbarItem(placement: .navigationBarLeading) {
-                        Button(action: {
-                            isDatePickerShown = true
-                        }) {
-                            HStack(spacing: 6) {
-                                Image(systemName: "calendar")
-                                    .font(.subheadline)
-                                    .fontWeight(.semibold)
-                                Text("Date")
-                                    .font(.subheadline)
-                                    .fontWeight(.semibold)
+                        HStack(spacing: AppTheme.smallPadding) {
+                            Button(action: {
+                                isDatePickerShown = true
+                            }) {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "calendar")
+                                        .font(.subheadline)
+                                        .fontWeight(.semibold)
+                                    Text("Date")
+                                        .font(.subheadline)
+                                        .fontWeight(.semibold)
+                                }
+                                .foregroundColor(.white)
+                                .padding(.vertical, 8)
+                                .padding(.horizontal, AppTheme.mediumPadding)
+                                .glassBackground(cornerRadius: AppTheme.smallCornerRadius, intensity: 0.85)
                             }
-                            .foregroundColor(.white)
-                            .padding(.vertical, 8)
-                            .padding(.horizontal, 12)
-                            .glassBackground(cornerRadius: 10, intensity: 0.85)
+
+                            if viewModel.isLoadingUpdate {
+                                ProgressView()
+                                    .scaleEffect(0.8)
+                                    .tint(.white)
+                            }
                         }
                     }
 
-                    // Today button to reset to current date
+                    // Favorite and Share buttons
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(action: {
-                            viewModel.loadAPOD(for: Date())
-                        }) {
-                            HStack(spacing: 6) {
-                                Image(systemName: "arrow.clockwise")
+                        HStack(spacing: AppTheme.smallPadding) {
+                            // Favorite button
+                            Button(action: {
+                                viewModel.toggleFavorite()
+                            }) {
+                                Image(systemName: viewModel.isFavorite ? "heart.fill" : "heart")
                                     .font(.subheadline)
                                     .fontWeight(.semibold)
-                                Text("Today")
-                                    .font(.subheadline)
-                                    .fontWeight(.semibold)
+                                    .foregroundColor(viewModel.isFavorite ? .red : .white)
+                                    .padding(.vertical, 8)
+                                    .padding(.horizontal, AppTheme.mediumPadding)
+                                    .glassBackground(cornerRadius: AppTheme.smallCornerRadius, intensity: 0.85)
                             }
-                            .foregroundColor(.white)
-                            .padding(.vertical, 8)
-                            .padding(.horizontal, 12)
-                            .glassBackground(cornerRadius: 10, intensity: 0.85)
+
+                            // Today button
+                            Button(action: {
+                                viewModel.loadAPOD(for: Date())
+                            }) {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "arrow.clockwise")
+                                        .font(.subheadline)
+                                        .fontWeight(.semibold)
+                                    Text("Today")
+                                        .font(.subheadline)
+                                        .fontWeight(.semibold)
+                                }
+                                .foregroundColor(.white)
+                                .padding(.vertical, 8)
+                                .padding(.horizontal, AppTheme.mediumPadding)
+                                .glassBackground(cornerRadius: AppTheme.smallCornerRadius, intensity: 0.85)
+                            }
                         }
                     }
                 }
