@@ -7,6 +7,7 @@ struct ContentView: View {
     @StateObject private var viewModel = APODViewModel()
     @State private var isDatePickerShown = false
     @State private var isSettingsShown = false
+    @State private var isFavoritesShown = false
     
     var body: some View {
         NavigationView {
@@ -326,9 +327,21 @@ struct ContentView: View {
                 .navigationTitle("NASA APOD")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
-                    // Date selector button
+                    // Date selector and favorites buttons
                     ToolbarItem(placement: .navigationBarLeading) {
                         HStack(spacing: AppTheme.smallPadding) {
+                            Button(action: {
+                                isFavoritesShown = true
+                            }) {
+                                Image(systemName: "heart.fill")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.red)
+                                    .padding(.vertical, 8)
+                                    .padding(.horizontal, AppTheme.mediumPadding)
+                                    .glassBackground(cornerRadius: AppTheme.smallCornerRadius, intensity: 0.85)
+                            }
+
                             Button(action: {
                                 isDatePickerShown = true
                             }) {
@@ -407,6 +420,9 @@ struct ContentView: View {
         }
         .sheet(isPresented: $isSettingsShown) {
             SettingsView()
+        }
+        .sheet(isPresented: $isFavoritesShown) {
+            FavoritesView()
         }
     }
 }
