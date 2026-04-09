@@ -2,119 +2,128 @@ import SwiftUI
 
 // ViewModifier for creating glass-like backgrounds that respond to motion
 struct GlassBackground: ViewModifier {
-    var cornerRadius: CGFloat = 16
-    
-    // Make motion manager optional to support previews
+    var cornerRadius: CGFloat = AppTheme.standardCornerRadius
+    var intensity: CGFloat = 1.0  // Controls strength of glass effect (0-1)
+    var useMotion: Bool = true
+
     @EnvironmentObject var motionManager: MotionManager
-    
-    // Provide fallback values when motion manager is not available
+
     private var roll: Double {
-        return motionManager.roll ?? 0.0
+        useMotion ? motionManager.roll : 0.0
     }
-    
+
     private var pitch: Double {
-        return motionManager.pitch ?? 0.0
+        useMotion ? motionManager.pitch : 0.0
     }
-    
+
     func body(content: Content) -> some View {
         content
-            // Semi-transparent white background
-            .background(
-                Color.white.opacity(0.12)
-            )
-            // Blur effect layer
-            .background(
-                Color.black.opacity(0.05)
-                    .blur(radius: 10)
-            )
-            // Gradient border for glass effect - shifts with motion
-            .overlay(
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .stroke(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color.white.opacity(0.6 + min(0.2, max(-0.2, roll * 0.2))),
-                                Color.white.opacity(0.2 + min(0.1, max(-0.1, pitch * 0.1))),
-                                Color.clear,
-                                Color.white.opacity(0.2 + min(0.1, max(-0.1, -roll * 0.1)))
-                            ]),
-                            startPoint: computeStartPoint(),
-                            endPoint: computeEndPoint()
-                        ),
-                        lineWidth: 1.5
-                    )
-            )
-            // Dynamic shadow based on motion
+            .background(createGlassBackground())
+            .overlay(createGlassBorder())
+            .overlay(createLightingEffect())
             .shadow(
-                color: Color.white.opacity(0.1 + min(0.05, max(-0.05, pitch * 0.1))),
-                radius: 8,
-                x: CGFloat(roll * 2),
-                y: CGFloat(pitch * 2)
+                color: Color.black.opacity(AppTheme.shadowOpacity + min(0.1, max(-0.1, pitch * 0.15))),
+                radius: AppTheme.shadowRadius,
+                x: CGFloat(roll * 3),
+                y: CGFloat(pitch * 3 + 2)
+            )
+            .shadow(
+                color: Color.white.opacity(AppTheme.highlightShadowOpacity * intensity),
+                radius: 4,
+                x: CGFloat(-roll * 1),
+                y: CGFloat(-pitch * 1 - 1)
             )
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
     }
-    
-    // Compute gradient start point based on device motion
+
+    // MARK: - Private Helper Methods
+
+    private func createGlassBackground() -> some View {
+        ZStack {
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.white.opacity(AppTheme.glassBaseOpacity * intensity),
+                    Color.white.opacity(AppTheme.glassSecondaryOpacity * intensity)
+                ]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+
+            Color.white
+                .opacity(AppTheme.glassAccentOpacity * intensity)
+                .blur(radius: AppTheme.glassSecondaryBlurRadius)
+
+            Color.blue.opacity(AppTheme.glassAccentOpacity * intensity)
+        }
+        .blur(radius: AppTheme.glassBlurRadius * intensity)
+    }
+
+    private func createGlassBorder() -> some View {
+        RoundedRectangle(cornerRadius: cornerRadius)
+            .stroke(
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.white.opacity(0.5 + min(0.25, max(-0.25, roll * 0.25)) * intensity),
+                        Color.white.opacity(0.15 + min(0.15, max(-0.15, pitch * 0.15)) * intensity),
+                        Color.clear,
+                        Color.white.opacity(0.15 + min(0.15, max(-0.15, -roll * 0.15)) * intensity),
+                        Color.blue.opacity(0.1 * intensity)
+                    ]),
+                    startPoint: computeStartPoint(),
+                    endPoint: computeEndPoint()
+                ),
+                lineWidth: 0.8
+            )
+    }
+
+    private func createLightingEffect() -> some View {
+        RoundedRectangle(cornerRadius: cornerRadius)
+            .stroke(
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.white.opacity(0.1 * intensity),
+                        Color.clear
+                    ]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                lineWidth: 1
+            )
+            .offset(y: -0.5)
+    }
+
     private func computeStartPoint() -> UnitPoint {
         let rollInfluence = min(0.2, max(-0.2, roll * 0.3))
         let pitchInfluence = min(0.2, max(-0.2, pitch * 0.3))
-        
-        return UnitPoint(
-            x: 0.0 + rollInfluence,
-            y: 0.0 + pitchInfluence
-        )
+
+        return UnitPoint(x: 0.0 + rollInfluence, y: 0.0 + pitchInfluence)
     }
-    
-    // Compute gradient end point based on device motion
+
     private func computeEndPoint() -> UnitPoint {
         let rollInfluence = min(0.2, max(-0.2, roll * 0.3))
         let pitchInfluence = min(0.2, max(-0.2, pitch * 0.3))
-        
-        return UnitPoint(
-            x: 1.0 - rollInfluence,
-            y: 1.0 - pitchInfluence
-        )
+
+        return UnitPoint(x: 1.0 - rollInfluence, y: 1.0 - pitchInfluence)
     }
 }
 
 // Extension for easy application of glass effect
 extension View {
-    func glassBackground(cornerRadius: CGFloat = 16) -> some View {
-        self.modifier(GlassBackground(cornerRadius: cornerRadius))
+    func glassBackground(
+        cornerRadius: CGFloat = AppTheme.standardCornerRadius,
+        intensity: CGFloat = 1.0,
+        useMotion: Bool = true
+    ) -> some View {
+        self.modifier(GlassBackground(cornerRadius: cornerRadius, intensity: intensity, useMotion: useMotion))
     }
 }
 
-// Preview-friendly version of the glass background
-struct PreviewFriendlyGlassBackground: ViewModifier {
-    var cornerRadius: CGFloat = 16
-    
-    func body(content: Content) -> some View {
-        content
-            .background(Color.white.opacity(0.12))
-            .background(Color.black.opacity(0.05).blur(radius: 10))
-            .overlay(
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .stroke(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color.white.opacity(0.6),
-                                Color.white.opacity(0.2),
-                                Color.clear,
-                                Color.white.opacity(0.2)
-                            ]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 1.5
-                    )
-            )
-            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-    }
-}
-
-// Provide a preview-friendly version that doesn't need the environment object
+// Preview-friendly version of the glass background (no motion)
 extension View {
-    func previewGlassBackground(cornerRadius: CGFloat = 16) -> some View {
-        self.modifier(PreviewFriendlyGlassBackground(cornerRadius: cornerRadius))
+    func previewGlassBackground(
+        cornerRadius: CGFloat = AppTheme.standardCornerRadius,
+        intensity: CGFloat = 1.0
+    ) -> some View {
+        self.modifier(GlassBackground(cornerRadius: cornerRadius, intensity: intensity, useMotion: false))
     }
 }

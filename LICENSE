@@ -1,21 +1,166 @@
-MIT License
+PROSPERITY PUBLIC LICENSE Version 1.0.0
 
-Copyright (c) 2025 Saca Adrian
+Licensor: Saca Adrian
+Software: NASA APOD App
+Date: 2025
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+================================================================================
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+PREAMBLE
+
+This Prosperity Public License ("License") provides a non-exclusive copyright
+license to the Software under the following conditions:
+
+1. The Software may be freely used for non-commercial purposes
+2. Commercial use requires a paid license agreement with the Licensor
+3. All derivative works must maintain this License and attribute the original
+   author
+
+================================================================================
+
+1. DEFINITIONS
+
+"Software" means the NASA APOD App code, documentation, and related materials
+provided under this License.
+
+"Licensor" means Saca Adrian, the copyright holder of the Software.
+
+"You" or "Your" means any individual or legal entity exercising permissions
+granted by this License.
+
+"Commercial Use" means any use of the Software, directly or indirectly, to
+generate revenue, including but not limited to:
+  - Selling the Software or services powered by the Software
+  - Using the Software to provide a service to paying customers
+  - Using the Software in a commercial product or service
+  - Using the Software for commercial research or analysis
+  - Any use in a for-profit business context
+
+"Non-Commercial Use" means use that is not primarily intended for or directed
+toward commercial advantage or monetary compensation, such as:
+  - Educational purposes
+  - Personal projects
+  - Open-source community projects (non-profit)
+  - Academic research (non-commercial)
+  - Hobby and personal use
+
+================================================================================
+
+2. GRANT OF LICENSE
+
+Subject to the terms of this License, the Licensor grants You a worldwide,
+royalty-free, non-exclusive license to:
+
+  a) Use, copy, modify, and distribute the Software for Non-Commercial Use
+
+  b) Create derivative works based on the Software for Non-Commercial Use
+
+  c) Publish and distribute modifications to the Software for Non-Commercial Use,
+     provided that:
+     - You maintain this License and all copyright notices
+     - You provide prominent notice of modifications
+     - Derivative works are licensed under this same License
+
+================================================================================
+
+3. COMMERCIAL USE
+
+Any Commercial Use of the Software is strictly prohibited without a Commercial
+License Agreement signed by the Licensor.
+
+To obtain a Commercial License, You must contact the Licensor to negotiate
+licensing terms, fees, and conditions. Contact information is provided in the
+project repository.
+
+Unauthorized Commercial Use is a material breach of this License and may result
+in civil and/or criminal liability.
+
+================================================================================
+
+4. ATTRIBUTION
+
+You must retain in all copies, distributions, and derivative works:
+
+  a) The original copyright notice: "Copyright (c) 2025 Saca Adrian"
+
+  b) A reference to this License
+
+  c) A notice that modifications were made (if applicable)
+
+  d) Attribution to the original creator in any derivative work's documentation
+
+Attribution must be visible and clear to all users of the Software or derivative
+works.
+
+================================================================================
+
+5. DISTRIBUTION
+
+If You distribute the Software or derivative works, You must:
+
+  a) License them under this same Prosperity Public License
+
+  b) Provide a copy of this License with every distribution
+
+  c) Clearly indicate any modifications made
+
+  d) Provide source code access for derivative works
+
+  e) Include a notice that commercial use requires a license from the Licensor
+
+================================================================================
+
+6. NO WARRANTY
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+
+IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+================================================================================
+
+7. LIMITATION OF LIABILITY
+
+IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL,
+CONSEQUENTIAL, OR PUNITIVE DAMAGES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGES.
+
+================================================================================
+
+8. TERMINATION
+
+This License is effective until terminated. Your rights terminate automatically
+if You:
+
+  a) Violate any term of this License, particularly by engaging in Commercial
+     Use without authorization
+
+  b) Fail to remove the Software from Commercial Use within 30 days of written
+     notice from the Licensor
+
+Upon termination, You must cease all use and distribution of the Software and
+destroy all copies in Your possession.
+
+================================================================================
+
+9. GOVERNING LAW
+
+This License is governed by and construed in accordance with the laws of the
+jurisdiction in which the Licensor resides, without regard to conflicts of law
+principles.
+
+================================================================================
+
+10. ENTIRE AGREEMENT
+
+This License constitutes the entire agreement between You and the Licensor
+regarding the Software and supersedes all prior negotiations, representations,
+or agreements.
+
+================================================================================
+
+END OF PROSPERITY PUBLIC LICENSE

@@ -5,7 +5,7 @@ A beautiful iOS application that displays NASA's Astronomy Picture of the Day (A
 ![iOS](https://img.shields.io/badge/iOS-15.0+-black?style=flat-square&logo=apple)
 ![Swift](https://img.shields.io/badge/Swift-5.5+-FA7343?style=flat-square&logo=swift&logoColor=white)
 ![Xcode](https://img.shields.io/badge/Xcode-13.0+-1575F9?style=flat-square&logo=xcode&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
+![License](https://img.shields.io/badge/License-PPL%20v1.0-orange?style=flat-square)
 
 ## 📚 Table of Contents
 
@@ -260,7 +260,26 @@ This app uses NASA's Astronomy Picture of the Day API:
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **Prosperity Public License v1.0.0**
+
+### License Summary
+
+- **Personal/Educational Use**: ✅ FREE
+- **Non-Commercial Projects**: ✅ FREE
+- **Commercial Use**: ❌ Requires paid license agreement
+
+### Commercial Licensing
+
+If you wish to use this application commercially, you must obtain a Commercial License from the author. This includes but is not limited to:
+
+- Using the app as part of a commercial product
+- Selling the app or services powered by it
+- Using it in a for-profit business context
+- Commercial API services or SaaS implementations
+
+**Contact for Commercial Licensing**: adrian.saca2004@gmail.com
+
+See the [LICENSE](LICENSE) file for complete terms and conditions.
 
 ## 🙏 Acknowledgments
 
