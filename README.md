@@ -27,7 +27,12 @@ A beautiful iOS application that displays NASA's Astronomy Picture of the Day (A
 - **Motion-Responsive UI**: Beautiful glassmorphism interface that responds to device movement
 - **Intuitive Date Selection**: Easy calendar-based date picker for exploring historical content
 - **Dark Theme Design**: Optimized for nighttime stargazing sessions
-- **Offline-Friendly**: Graceful error handling when network is unavailable
+- **Offline Mode**: View cached APODs when network is unavailable
+- **Favorites System**: Save and browse your favorite APODs
+- **Share Functionality**: Share APOD images and descriptions with others
+- **Customizable Settings**: Adjust glass effect intensity, motion effects, and notifications
+- **Robust Error Handling**: Clear error messages and automatic retry logic with exponential backoff
+- **Image Caching**: Smart caching to reduce bandwidth and improve performance
 
 ## 🛠 Setup & Installation
 
@@ -79,17 +84,31 @@ A beautiful iOS application that displays NASA's Astronomy Picture of the Day (A
 
 ## 🎮 Controls & Usage
 
-### Navigation
+### Navigation & Toolbar
 
-- **Date Button** (📅): Tap the calendar icon in the top-left to open the date picker
-- **Today Button** (🔄): Tap the refresh icon in the top-right to return to today's APOD
+**Left Side:**
+- **❤️ Favorites**: View your saved favorite APODs
+- **📅 Date**: Open the date picker to browse historical APODs
+- **⏳ Loading Indicator**: Shows when fetching new APOD data
+
+**Right Side:**
+- **⚙️ Settings**: Customize glass effects, motion, and notifications
+- **❤️ Heart**: Toggle favorite status for current APOD (red when favorited)
+- **🔄 Today**: Jump back to today's APOD
 
 ### Date Selection
 
-1. Tap the **Date** button to open the calendar modal
-2. **Scroll through months/years** or tap dates directly
-3. Tap **"View APOD"** to load the selected date
-4. Tap **"Cancel"** or the background to close without changing dates
+1. Tap the **📅 Date** button to open the calendar modal
+2. **Scroll through months/years** or tap dates directly to navigate
+3. Tap **"View APOD"** to load the selected date's content
+4. Tap **"Cancel"** to close without changing dates
+
+### Favorites Management
+
+1. Tap the **❤️ Favorites** button on the left to view all saved APODs
+2. Tap the **Heart button** (right side) on any APOD to save/remove it from favorites
+3. View saved APODs sorted by date (newest first) in the Favorites view
+4. Tap **"Remove"** on any card in Favorites to delete it
 
 ### Viewing Content
 
@@ -121,21 +140,31 @@ The app follows the MVVM (Model-View-ViewModel) pattern with SwiftUI and uses on
 NASAAPOD/
 ├── NASAAPODApp.swift          # App entry point and configuration
 ├── ContentView.swift          # Main UI view with glassmorphism design
-├── APODViewModel.swift        # Business logic and state management
-├── APODModel.swift           # Data models for API responses
-├── NetworkService.swift      # API service layer with Combine
-├── MotionManager.swift       # CoreMotion integration for UI effects
-├── GlassBackground.swift     # Custom glassmorphism UI modifier
-├── APIConfig-Sample.swift    # Template for API configuration
-└── Assets.xcassets/         # App icons and visual assets
+├── APODViewModel.swift        # Business logic, state management, and persistence
+├── APODModel.swift            # Data models for API responses
+├── APODError.swift            # Custom error types with user messages
+├── MediaType.swift            # Type-safe media type enum
+├── NetworkService.swift       # API service layer with Combine + timeout + caching
+├── MotionManager.swift        # CoreMotion integration for UI effects
+├── GlassBackground.swift      # Custom glassmorphism UI modifier
+├── AppTheme.swift             # Centralized theme constants
+├── PersistenceService.swift   # Local caching, favorites, and settings
+├── SettingsView.swift         # User preferences UI
+├── FavoritesView.swift        # Browse and manage favorite APODs
+├── APIConfig-Sample.swift     # Template for API configuration
+└── Assets.xcassets/           # App icons and visual assets
 ```
 
 ### Key Components
 
-- **APODViewModel**: Manages app state, API calls, and date selection using Combine
-- **NetworkService**: Handles NASA API communication with proper error handling
-- **MotionManager**: Tracks device motion for responsive UI effects
-- **GlassBackground**: Custom SwiftUI modifier for glassmorphism effects
+- **APODViewModel**: Manages app state, API calls, date selection, favorites, and retry logic using Combine
+- **NetworkService**: Handles NASA API communication with timeout, error handling, and automatic retry
+- **MotionManager**: Tracks device motion for responsive UI effects at 60Hz
+- **GlassBackground**: Custom SwiftUI modifier for glassmorphism effects with motion responsiveness
+- **PersistenceService**: Manages local caching, favorites storage, and user settings
+- **AppTheme**: Centralized styling constants for easy theme customization
+- **SettingsView**: User preferences for glass intensity, motion, notifications, and offline mode
+- **FavoritesView**: Browse, view, and manage saved favorite APODs
 
 ## 🤝 Contributing
 
@@ -188,13 +217,25 @@ We welcome contributions! Please follow these guidelines:
 
 ### Areas for Contribution
 
-- 🎨 **UI/UX Improvements**: Enhanced animations, better loading states
-- 🔧 **Feature Additions**: Favorites system, sharing capabilities, offline mode
-- 🐛 **Bug Fixes**: Network handling, date validation, motion edge cases
-- 📱 **Platform Support**: iPad optimization, macOS Catalyst support
-- 🧪 **Testing**: Unit tests, UI tests, performance optimization
-- 📚 **Documentation**: Code comments, user guides, architecture docs
-- 📸 **Screenshots**: App store screenshots, documentation images
+- 🎨 **UI/UX Improvements**: Enhanced animations, gesture controls, accessibility
+- 🔧 **Feature Additions**: Push notifications, Siri shortcuts, widget support
+- 🐛 **Bug Fixes**: Edge cases, performance optimization, platform-specific issues
+- 📱 **Platform Support**: iPad optimization, macOS Catalyst support, watchOS companion
+- 🧪 **Testing**: Unit tests, UI tests, integration tests
+- 📚 **Documentation**: Code comments, user guides, API documentation
+- 📸 **Screenshots**: App store screenshots, demo GIFs, documentation images
+- 🌐 **Localization**: Multi-language support (i18n)
+
+### Recently Completed Features
+
+✅ **Favorites System** - Save and browse favorite APODs  
+✅ **Offline Mode** - View cached APODs without internet  
+✅ **Settings Screen** - Customizable preferences  
+✅ **Share Functionality** - Share APODs via native share sheet  
+✅ **Retry Logic** - Exponential backoff for failed requests  
+✅ **Image Caching** - Smart memory and disk caching  
+✅ **Error Handling** - Custom error types with user messages  
+✅ **Type Safety** - MediaType enum and URL validation
 
 ### Documentation Guidelines
 
@@ -220,6 +261,15 @@ open NASAAPOD.xcodeproj
 xcodebuild -project NASAAPOD.xcodeproj -scheme NASAAPOD -destination 'platform=iOS Simulator,name=iPhone 14' build
 ```
 
+### Development Features
+
+- **Network Timeout**: 15-second request timeout, 30-second resource timeout
+- **Automatic Retry**: Exponential backoff (1s, 2s, 4s, 8s, 16s) on network failures
+- **Image Caching**: 500MB memory + 1GB disk cache for optimal performance
+- **Local Persistence**: Favorites and settings saved locally
+- **Offline Support**: App gracefully degrades with cached data
+- **Error Recovery**: Detailed error messages with recovery suggestions
+
 ### Testing Motion Effects
 
 Motion-responsive UI elements only work on physical devices with gyroscope support. To test:
@@ -227,6 +277,22 @@ Motion-responsive UI elements only work on physical devices with gyroscope suppo
 1. Build to a physical iPhone/iPad
 2. Hold device normally and tilt gently
 3. Observe subtle glass border shifts following device orientation
+4. Disable in Settings if battery optimization is needed
+
+### Testing Offline Mode
+
+1. Load an APOD while connected to internet
+2. Enable Airplane Mode or disconnect network
+3. The cached APOD will still display
+4. Error messages indicate offline status
+5. Enable Offline in Settings to allow offline viewing
+
+### Testing Favorites & Persistence
+
+1. Toggle the heart icon to save/remove favorites
+2. View favorites via the Favorites button
+3. Force quit the app and relaunch
+4. Favorites persist across sessions
 
 ### API Rate Limits
 
@@ -234,7 +300,7 @@ NASA's API has the following limits:
 - **Demo Key**: 30 requests per hour, 50 requests per day
 - **Registered Key**: 1,000 requests per hour
 
-For development, the demo key is usually sufficient since APODs are cached daily.
+The app includes automatic retry logic to handle rate limiting gracefully. Cached APODs help minimize API calls during development.
 
 ## 🌟 NASA APOD API
 
