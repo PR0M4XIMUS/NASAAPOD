@@ -277,7 +277,7 @@ If you wish to use this application commercially, you must obtain a Commercial L
 - Using it in a for-profit business context
 - Commercial API services or SaaS implementations
 
-**Contact for Commercial Licensing**: [Contact the repository owner for licensing inquiries]
+**Contact for Commercial Licensing**: adrian.saca2004@gmail.com
 
 See the [LICENSE](LICENSE) file for complete terms and conditions.
 
